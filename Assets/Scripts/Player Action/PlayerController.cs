@@ -34,6 +34,7 @@ public class PlayerController : MonoBehaviour
     [Header("Combat & Mechanics")]
     [SerializeField] private int maxHealth = 100;
     [SerializeField] private int currentHealth;
+    [SerializeField] private Slider hpSlider;
     [SerializeField] private float baseAttackDuration = 0.7f;
     private float currentAttackDuration; // Durasi serangan yang bisa disesuaikan dengan multiplier
     private bool isAttackBuffered = false; // Menyimpan antrean klik selanjutnya
@@ -110,6 +111,13 @@ public class PlayerController : MonoBehaviour
         currentHealth = maxHealth;
         baseMoveSpeed = moveSpeed;
         currentAttackDuration = baseAttackDuration;
+
+        if (hpSlider != null)
+        {
+            hpSlider.maxValue = maxHealth;
+            hpSlider.value = currentHealth;
+        }
+
         ChangeState(PlayerState.Idle);
     }
 
@@ -123,15 +131,16 @@ public class PlayerController : MonoBehaviour
         
         // Membaca input jalan (A/D)
         horizontalInput = gameInput.Player.Move.ReadValue<Vector2>().x;
-        // Jika sistem input error/stuck, cek kondisi fisik keyboard pemain
-        if (Keyboard.current != null)
-        {
-            // Jika tombol A dan tombol D secara FISIK tidak sedang ditekan oleh jari pemain
-            if (!Keyboard.current.aKey.isPressed && !Keyboard.current.dKey.isPressed)
-            {
-                horizontalInput = 0f; // Paksa reset ke 0 agar tidak ghosting/jalan sendiri
-            }
-        }
+
+        // // Jika sistem input error/stuck, cek kondisi fisik keyboard pemain
+        // if (Keyboard.current != null)
+        // {
+        //     // Jika tombol A dan tombol D secara FISIK tidak sedang ditekan oleh jari pemain
+        //     if (!Keyboard.current.aKey.isPressed && !Keyboard.current.dKey.isPressed)
+        //     {
+        //         horizontalInput = 0f; // Paksa reset ke 0 agar tidak ghosting/jalan sendiri
+        //     }
+        // }
         anim.SetBool("isRunning", Mathf.Abs(horizontalInput) > 0.1f);
 
         FlipController();
@@ -454,6 +463,7 @@ public class PlayerController : MonoBehaviour
 
         // 1. Kurangi darah player
         currentHealth -= damage;
+        UpdateHealthUI();
         Debug.Log($"Player terkena hit! Sisa darah: {currentHealth}");
 
         // 2. Aktifkan waktu kebal sesaat agar tidak mati instan
@@ -510,6 +520,14 @@ public class PlayerController : MonoBehaviour
         Debug.Log($"Attack Speed Meningkat! Multiplier saat ini: {attackSpeedMultiplier}");
     }
 
+    private void UpdateHealthUI()
+    {
+        if (hpSlider != null)
+        {
+            hpSlider.value = currentHealth;
+        }
+    }
+
     private void FlipController()
     {
         if (currentState == PlayerState.Dash || currentState == PlayerState.Stagger || currentState == PlayerState.Dead) return;
@@ -547,6 +565,7 @@ public class PlayerController : MonoBehaviour
     {
         currentHealth += amount;
         if (currentHealth > maxHealth) currentHealth = maxHealth;
+        UpdateHealthUI();
         Debug.Log($"HP bertambah! HP Sekarang: {currentHealth}");
     }
 
