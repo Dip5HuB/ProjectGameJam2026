@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6937492577652034799}
   - component: {fileID: 970949325723672473}
   - component: {fileID: 1060585179122278425}
-  m_Layer: 8
+  m_Layer: 6
   m_Name: item_aegis
   m_TagString: Item
   m_Icon: {fileID: 0}

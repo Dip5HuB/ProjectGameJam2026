@@ -45,6 +45,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float comboResetDelay = 1.5f; // Batas waktu toleransi jeda klik antar combo
     private float comboResetTimer;
     [SerializeField] private LayerMask enemyLayer; // Layer khusus untuk mendeteksi Musuh
+    [SerializeField] private int enemyContactDamage = 15; // Damage saat menyenggol musuh
+    [SerializeField] private float iFrameDuration = 0.8f;   // Durasi kebal setelah kena hit (0.8 detik)
+    private float iFrameTimer; // Menghitung mundur sisa waktu kebal
 
     [Header("Buff & Drop System Settings")]
     [SerializeField] private BuffType activeBuff = BuffType.None;
@@ -216,6 +219,25 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+
+        if (iFrameTimer > 0)
+        {
+            iFrameTimer -= Time.deltaTime;
+        }
+
+        // Cek sentuhan musuh hanya jika player TIDAK sedang kebal, TIDAK mati, dan TIDAK kebal peci haji (Aegis)
+        if (iFrameTimer <= 0 && currentState != PlayerState.Dead && currentState != PlayerState.Dash && !isInvincible)
+        {
+            // Membuat kotak sensor fiktif setinggi tubuh player (Lebar: 0.6, Tinggi: 1.2)
+            // Catatan: Jika pivot karaktermu ada di kaki, naikkan posisi pusat kotak sedikit ke atas (+ 0.6f)
+            Vector2 playerCenter = new Vector2(transform.position.x, transform.position.y + 0.6f);
+            Collider2D touchingEnemy = Physics2D.OverlapBox(playerCenter, new Vector2(0.6f, 1.2f), 0f, enemyLayer);
+
+            if (touchingEnemy != null)
+            {
+                TakeDamage(enemyContactDamage); // Player otomatis terluka karena menyenggol musuh!
+            }
+        }
     }
 
     private void FixedUpdate()
@@ -251,6 +273,12 @@ public class PlayerController : MonoBehaviour
     public void ChangeState(PlayerState newState)
     {
         if (currentState == PlayerState.Dead) return;
+
+        // Pastikan centangan isStagger mati setiap kali karakter keluar dari state Stagger
+        if (currentState == PlayerState.Stagger)
+        {
+            anim.SetBool("isStagger", false);
+        }
 
         // Reset kecepatan animasi ke normal setiap ganti state
         anim.speed = 1f; 
@@ -290,7 +318,7 @@ public class PlayerController : MonoBehaviour
                 break;
 
             case PlayerState.Stagger:
-                anim.SetTrigger("Stagger"); // Picu animasi terkejut/hit
+                anim.SetBool("isStagger", true); // Picu animasi terkejut/hit
                 stateTimer = staggerDuration;
                 break;
 
@@ -422,13 +450,16 @@ public class PlayerController : MonoBehaviour
     public void TakeDamage(int damage)
     {
         // Proteksi: Jika player sudah mati, abaikan damage berikutnya
-        if (currentState == PlayerState.Dead || isInvincible) return;
+        if (currentState == PlayerState.Dead || isInvincible || iFrameTimer > 0) return;
 
         // 1. Kurangi darah player
         currentHealth -= damage;
         Debug.Log($"Player terkena hit! Sisa darah: {currentHealth}");
 
-        // 2. CEK KONDISI DARAH HABIS ATAU MASIH ADA
+        // 2. Aktifkan waktu kebal sesaat agar tidak mati instan
+        iFrameTimer = iFrameDuration;
+
+        // 3. CEK KONDISI DARAH HABIS ATAU MASIH ADA
         if (currentHealth <= 0)
         {
             currentHealth = 0;
@@ -556,6 +587,7 @@ public class PlayerController : MonoBehaviour
         moveSpeed = baseMoveSpeed; // Kembalikan speed jalan ke normal
         attackSpeedMultiplier = 1f; // Kembalikan kecepatan sabetan ke normal
         isInvincible = false;      // Matikan mode kebal
+        iFrameTimer = 0f;          // Reset timer kebal
         Debug.Log("Durasi buff habis, status player kembali normal.");
     }
 }

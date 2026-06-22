@@ -131,7 +131,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 416310474}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: AttackPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -591,7 +591,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -1864683203
+  m_SortingLayerID: 2036899917
   m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 518400223, guid: cc35a479fa59985459126882f8ccc460, type: 3}
@@ -1030,7 +1030,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4125508116560406233}
   - component: {fileID: 5086214028865266211}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: awan
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1047,7 +1047,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2728085148645857377}
   - component: {fileID: 3643177458791708550}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Pletokan 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1093,7 +1093,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1864683203
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 4
   m_Sprite: {fileID: 751934114, guid: cc35a479fa59985459126882f8ccc460, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -1115,7 +1115,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6352127940106353741}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: bone_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1131,7 +1131,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2887560902882377502}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: bone_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1177,7 +1177,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1864683203
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 1
   m_Sprite: {fileID: -841229819, guid: cc35a479fa59985459126882f8ccc460, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -1229,7 +1229,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1864683203
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 9
   m_Sprite: {fileID: 1610604053, guid: cc35a479fa59985459126882f8ccc460, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -1251,7 +1251,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8898815962412463151}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: bone_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1297,7 +1297,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1864683203
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 2
   m_Sprite: {fileID: 1956269449, guid: cc35a479fa59985459126882f8ccc460, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -1320,7 +1320,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2498694688191049421}
   - component: {fileID: 9117599934899634063}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Bayangan (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1337,7 +1337,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8467187431885925769}
   - component: {fileID: 1143655871980393080}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Tangan R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1369,7 +1369,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8004232491961578880}
   - component: {fileID: 6737041151752742167}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Pletokan 1 R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1385,7 +1385,7 @@ SortingGroup:
   m_GameObject: {fileID: 6920475537675292707}
   m_Enabled: 1
   m_SortingLayerID: -1864683203
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_SortAtRoot: 0
 --- !u!1 &2163588040125308883
@@ -1398,7 +1398,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5776198585862739901}
   - component: {fileID: 5776198585862739902}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: GroundCheck
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1444,7 +1444,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1864683203
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 10
   m_Sprite: {fileID: -1400512593, guid: cc35a479fa59985459126882f8ccc460, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -1617,7 +1617,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4428381132841676097}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: efek kalah
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1695,7 +1695,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1864683203
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 8
   m_Sprite: {fileID: 1403154366, guid: 58f37d479a4608f47a5408a3df63f83f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -1847,7 +1847,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1864683203
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 5
   m_Sprite: {fileID: 650541595, guid: cc35a479fa59985459126882f8ccc460, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -1969,7 +1969,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7197854866465003747}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Shot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2038,7 +2038,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8230571192341078428}
   - component: {fileID: 5600490172308046029}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Pinggul
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2084,7 +2084,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1864683203
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 3
   m_Sprite: {fileID: 367767116, guid: cc35a479fa59985459126882f8ccc460, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2159,7 +2159,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2890833434380473561}
   - component: {fileID: 2191123808569953682}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Kepala
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2278,7 +2278,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8110011161225931103}
   - component: {fileID: 7738440219722275274}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Pletokan 1 R (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2295,7 +2295,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3574716645409000292}
   - component: {fileID: 1142515208797068760}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Kaki L 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2356,7 +2356,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1864683203
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 9
   m_Sprite: {fileID: -864686619, guid: cc35a479fa59985459126882f8ccc460, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2379,7 +2379,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7775445797898015190}
   - component: {fileID: 3963931573438576225}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Pletokan 2 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2425,7 +2425,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1864683203
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 6
   m_Sprite: {fileID: 518400223, guid: cc35a479fa59985459126882f8ccc460, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2498,7 +2498,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1864683203
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 7
   m_Sprite: {fileID: 21053861, guid: 58f37d479a4608f47a5408a3df63f83f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2521,7 +2521,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3467221141861938641}
   - component: {fileID: 1474043758717692810}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: kaki L 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2538,7 +2538,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3891851563065849709}
   - component: {fileID: 6590587128216094692}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Badan
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2560,7 +2560,7 @@ GameObject:
   - component: {fileID: 2129729663426813967}
   - component: {fileID: 4577181415903181137}
   - component: {fileID: 2828206760660186262}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Gojo
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -2595,7 +2595,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7645261530383024467}
   - component: {fileID: 6422105646267966435}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Tangan T
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2612,7 +2612,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5745087893064314249}
   - component: {fileID: 2937257806699489561}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: efek tembak
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2629,7 +2629,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1901048290886664805}
   - component: {fileID: 5618837911434857083}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Pletokan 1 T
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2742,7 +2742,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4521929681535872739}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: bone_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2809,7 +2809,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4165385421360305200}
   - component: {fileID: 4263518065395464199}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Kaki R 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2930,7 +2930,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7808597753666639243}
   - component: {fileID: 626205988576199627}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Kaki R 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
