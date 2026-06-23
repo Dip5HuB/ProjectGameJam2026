@@ -506,7 +506,7 @@ public class PlayerController : MonoBehaviour
 
             // 3. Hubungkan dengan script milik musuh (Misal nama script musuhmu adalah EnemyHealth)
             // Ganti "EnemyHealth" di bawah sesuai dengan nama script darah musuh yang kamu/tim buat nanti
-            if (enemy.TryGetComponent<Enemy>(out Enemy enemyComponent))
+            if (enemy.TryGetComponent<EnemyBase>(out EnemyBase enemyComponent))
             {
                 // Kirim damage ke musuh melalui fungsinya
                 enemyComponent.TakeDamage(attackDamage);
