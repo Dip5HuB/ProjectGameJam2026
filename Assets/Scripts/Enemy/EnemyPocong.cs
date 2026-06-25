@@ -117,7 +117,7 @@ public class EnemyPocong : EnemyBase
                 break;
 
             // ==========================================
-            // FASE 2: MELUNCUR MANDALIKA (Dashing)
+            // FASE 2: MELUNCUR (Dashing)
             // ==========================================
             case AttackPhase.Dashing:
                 // Dorong lurus secara fisik murni menggunakan arah yang sudah dikunci
