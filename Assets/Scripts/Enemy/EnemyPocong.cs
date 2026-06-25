@@ -2,20 +2,42 @@ using UnityEngine;
 
 public class EnemyPocong : EnemyBase
 {
-    [Header("Pocong Specific Mechanics")]
+    [Header("Pocong Hopping Mechanics")]
     [SerializeField] private float jumpForceX = 4f;
     [SerializeField] private float jumpForceY = 5f;
-    [SerializeField] private float hopDelay = 1.5f; // Jeda waktu ritmis antar lompatan
+    [SerializeField] private float hopDelay = 1.2f; // Jeda antar lompatan
     private float hopTimer;
-    private bool isHoppping = false;
+    private bool isHopping = false;
 
-    [Header("Ground Check Pocong")]
+    [Header("Ground Check")]
     [SerializeField] private Transform groundCheck;
     [SerializeField] private LayerMask groundLayer;
 
+    [Header("New Dash & Rotate Mechanics")]
+    [SerializeField] private float attackRangeThreshold = 2.5f; // Jarak pemicu serangan
+    [SerializeField] private float telegraphDuration = 0.5f;    // Durasi ancang-ancang
+    [SerializeField] private float dashDuration = 0.35f;         // Durasi meluncur/dash
+    [SerializeField] private float dashSpeedMultiplier = 4f;     // Kekuatan laju dash
+    [SerializeField] private float recoverDuration = 0.4f;       // Waktu bangun kembali
+    private float originalGravity;
+
+    // Tracker Fase Serangan Internal
+    private enum AttackPhase { Telegraph, Dashing, Recover }
+    private AttackPhase currentPhase;
+    private float phaseTimer;
+    private float lockedDashDirection; // Mengunci arah agar tidak terjadi bug ketarik/magnet
+
+    protected override void Start()
+    {
+        base.Start(); // Tetap jalankan fungsi Start milik EnemyBase
+        
+        // Simpan nilai gavitasi asli yang kamu setel di Inspector (misal: 1 atau 2)
+        if (rb != null) originalGravity = rb.gravityScale; 
+    }
+    
     protected override void UpdateIdleState()
     {
-        // Pocong bersandar tegak lurus di sudut, jika player mendekat, masuk ke Chase Behavior (Move)
+        // Diam tegak lurus, pindah ke Move jika player masuk area aggro
         if (IsPlayerInAggroRange())
         {
             ChangeState(EnemyState.Move);
@@ -26,50 +48,124 @@ public class EnemyPocong : EnemyBase
     {
         if (playerTransform == null) return;
 
-        // Hitung arah menuju player (Kanan = 1, Kiri = -1)
+        // 1. Hitung arah ke player untuk keperluan visual hadap & lompat
         float direction = playerTransform.position.x > transform.position.x ? 1f : -1f;
+        FlipSprite(direction);
 
-        // Logika Lompat Ritmis (Jump -> Land -> Jeda)
+        // 2. Hitung waktu mundur jeda lompat & cek tanah
         hopTimer -= Time.deltaTime;
         bool isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
 
-        if (isGrounded && !isHoppping && hopTimer <= 0)
+        // LOGIKA LOMPAT RITMIS
+        if (isGrounded && !isHopping && hopTimer <= 0)
         {
-            // Eksekusi Lompat menuju player
-            isHoppping = true;
+            isHopping = true;
             rb.velocity = new Vector2(direction * jumpForceX, jumpForceY);
             if (anim != null) anim.SetTrigger("Jump");
         }
 
-        // Jika baru saja mendarat, aktifkan jeda ritmis sebelum lompat lagi
-        if (isGrounded && isHoppping && rb.velocity.y <= 0.1f)
+        // MENDARAT: Berikan rem horizontal agar tidak meluncur licin
+        if (isGrounded && isHopping && rb.velocity.y <= 0.1f)
         {
-            isHoppping = false;
-            hopTimer = hopDelay; // Setel waktu tunggu santai sebelum melompat kembali
-            rb.velocity = new Vector2(0, rb.velocity.y); // Hentikan luncuran x saat mendarat
+            isHopping = false;
+            hopTimer = hopDelay;
+            rb.velocity = new Vector2(0, rb.velocity.y);
         }
 
-        // Jika jarak ke player sudah sangat dekat, masuk ke Telegraph & Execution (Attack State)
-        if (Vector2.Distance(transform.position, playerTransform.position) <= 2f)
+        // 3. CEK JARAK SERANG: Jika sudah pas, masuk ke fase menyerang
+        if (Vector2.Distance(transform.position, playerTransform.position) <= attackRangeThreshold)
         {
+            rb.velocity = Vector2.zero; // Rem total posisi sebelum ancang-ancang
             ChangeState(EnemyState.Attack);
-            stateTimer = 0.5f; // Waktu ancang-ancang atlet lari sebelum melesat kilat
-            rb.velocity = Vector2.zero;
+            
+            // Mulai dari Fase 1: Telegraph (Ancang-Ancang)
+            currentPhase = AttackPhase.Telegraph;
+            phaseTimer = telegraphDuration;
         }
     }
 
     protected override void UpdateAttackState()
     {
-        stateTimer -= Time.deltaTime;
+        phaseTimer -= Time.deltaTime;
 
-        if (stateTimer <= 0)
+        switch (currentPhase)
         {
-            // EKSEKUSI SERANGAN KILAT: Melesat kencang ke arah player
-            float dashDir = playerTransform.position.x > transform.position.x ? 1f : -1f;
-            rb.velocity = new Vector2(dashDir * moveSpeed * 3f, rb.velocity.y);
-            
-            // Kembali ke move state setelah menerjang beberapa saat
-            ChangeState(EnemyState.Move);
+            // ==========================================
+            // FASE 1: ANCANG-ANCANG (Telegraph)
+            // ==========================================
+            case AttackPhase.Telegraph:
+                rb.velocity = new Vector2(0, rb.velocity.y); // Kunci posisi X agar diam tegak
+
+                if (phaseTimer <= 0)
+                {
+                    // Transisi ke Fase 2 (Dashing)
+                    currentPhase = AttackPhase.Dashing;
+                    phaseTimer = dashDuration;
+
+                    lockedDashDirection = playerTransform.position.x > transform.position.x ? 1f : -1f;
+
+                    // MATIKAN GRAVITASI SEBELUM MELUNCUR
+                    rb.gravityScale = 0f; 
+                    rb.velocity = new Vector2(rb.velocity.x, 0f);
+
+                    // ROTASI 90 DERAJAT: Rebah tidur horizontal sesuai arah terjangnya
+                    float zRotation = lockedDashDirection > 0 ? -90f : 90f;
+                    transform.localEulerAngles = new Vector3(0, 0, zRotation);
+                    
+                    if (anim != null) anim.SetTrigger("DashAttack");
+                }
+                break;
+
+            // ==========================================
+            // FASE 2: MELUNCUR MANDALIKA (Dashing)
+            // ==========================================
+            case AttackPhase.Dashing:
+                // Dorong lurus secara fisik murni menggunakan arah yang sudah dikunci
+                rb.velocity = new Vector2(lockedDashDirection * moveSpeed * dashSpeedMultiplier, 0f);
+
+                if (phaseTimer <= 0)
+                {
+                    // Transisi ke Fase 3 (Recover / Bangun)
+                    currentPhase = AttackPhase.Recover;
+                    phaseTimer = recoverDuration;
+
+                    rb.gravityScale = originalGravity; // Kembalikan gravitasi ke nilai asli
+
+                    // KEMBALI TEGAK LURUS (0 Derajat)
+                    transform.localEulerAngles = Vector3.zero;
+                    rb.velocity = new Vector2(0, rb.velocity.y); // Rem setelah melewati player
+                }
+                break;
+
+            // ==========================================
+            // FASE 3: BANGUN & MODAL BALIK BADAN (Recover)
+            // ==========================================
+            case AttackPhase.Recover:
+                rb.velocity = new Vector2(0, rb.velocity.y); // Diam sejenak proses berdiri
+
+                if (playerTransform != null)
+                {
+                    // LANGSUNG BERBALIK ARAH menghadap player kembali saat berdiri
+                    float faceDir = playerTransform.position.x > transform.position.x ? 1f : -1f;
+                    FlipSprite(faceDir);
+                }
+
+                if (phaseTimer <= 0)
+                {
+                    // Selesai seluruh rangkaian serangan, kembali melompat normal mengejar player
+                    ChangeState(EnemyState.Move);
+                    hopTimer = hopDelay; // Berikan jeda nafas sebelum lompat lagi
+                }
+                break;
         }
+    }
+
+    // Fungsi pembantu universal untuk mengatur visual arah hadap musuh
+    private void FlipSprite(float dir)
+    {
+        if (dir > 0)
+            transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+        else if (dir < 0)
+            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
     }
 }

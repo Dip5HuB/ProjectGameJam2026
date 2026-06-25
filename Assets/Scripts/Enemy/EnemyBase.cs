@@ -11,7 +11,7 @@ public class EnemyBase : MonoBehaviour
     [SerializeField] protected float moveSpeed = 3f;
 
     [Header("Player Detection")]
-    [SerializeField] protected float aggroRange = 5f;
+    [SerializeField] protected float aggroRange = 5f; // jarak musuh melihat player
     [SerializeField] protected LayerMask playerLayer;
     protected Transform playerTransform;
 
