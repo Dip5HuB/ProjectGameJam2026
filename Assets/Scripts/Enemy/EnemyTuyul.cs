@@ -2,21 +2,41 @@ using UnityEngine;
 
 public class EnemyTuyul : EnemyBase
 {
-    [Header("Tuyul Trick Settings")]
-    [SerializeField] private float scrambleFrequency = 5f; // Kecepatan gelombang zig-zag
-    [SerializeField] private float scrambleMagnitude = 3f; // Lebar belokan zig-zag
-    [SerializeField] private float safeDistance = 3.5f;     // Jarak tipu daya untuk mundur
+    [Header("Tuyul Erratic Movement")]
+    [SerializeField] private float preferredRange = 3.5f;     // Jarak psikologis yang dijaga Tuyul untuk mengecoh
+    [SerializeField] private float zigZagFrequency = 8f;     // Kecepatan keliaran belokan zig-zag
+    [SerializeField] private float zigZagMagnitude = 4f;     // Lebar jarak belokan zig-zag
+    [SerializeField] private float attackCheckCooldown = 1.5f; // Jeda waktu antar keputusan untuk menerkam
+    private float attackDecisionTimer;
 
-    private float zigZagSign = 1f;
-    private float behaviorChangeTimer;
+    [Header("Unpredictable Pounce Settings")]
+    [SerializeField] private float telegraphDuration = 0.4f;   // Ancang-ancang singkat ala atlet sprint
+    [SerializeField] private float pounceDuration = 0.4f;      // Durasi melayang di udara saat menerkam
+    [SerializeField] private float basePounceForceX = 8f;      // Kekuatan dorong horizontal dasar
+    [SerializeField] private float minPounceForceY = 4f;       // Batas minimal lompatan vertikal
+    [SerializeField] private float maxPounceForceY = 8f;       // Batas maksimal lompatan vertikal (diacak)
+
+    // Tracker Fase Serangan Internal
+    private enum AttackPhase { Telegraph, Pouncing, Recover }
+    private AttackPhase currentPhase;
+    private float phaseTimer;
+    private float lockedDirection;
+    private float randomizedJumpForceY;
+
+    protected override void Start()
+    {
+        base.Start();
+        attackDecisionTimer = attackCheckCooldown;
+    }
 
     protected override void UpdateIdleState()
     {
-        // Menggelung diam memperlihatkan mata bersinar dalam gelap
+        // Kondisi Awal: Menggelung diam di sudut gelap, hanya memperlihatkan dua mata bersinar.
+        // Pindah ke mode Move (Mengejar/Mengecoh) jika Gojo mendekat.
         if (IsPlayerInAggroRange())
         {
+            if (anim != null) anim.SetBool("isScrambling", true);
             ChangeState(EnemyState.Move);
-            behaviorChangeTimer = 1f;
         }
     }
 
@@ -27,52 +47,126 @@ public class EnemyTuyul : EnemyBase
         float distanceToPlayer = Vector2.Distance(transform.position, playerTransform.position);
         float directionX = playerTransform.position.x > transform.position.x ? 1f : -1f;
 
-        behaviorChangeTimer -= Time.deltaTime;
-        if (behaviorChangeTimer <= 0)
-        {
-            // Mengacak pola belokan zig-zag secara ritmis
-            zigZagSign = Random.value > 0.5f ? 1f : -1f;
-            behaviorChangeTimer = Random.Range(0.4f, 0.8f);
-        }
+        // 1. FORMULA ZIG-ZAG (Meliuk Liar): Menggunakan gelombang Sinus pada kecepatan sumbu X
+        float zigZagOffset = Mathf.Sin(Time.time * zigZagFrequency) * zigZagMagnitude;
 
-        // LOGIKA MENJAGA JARAK (Mengecoh)
-        if (distanceToPlayer < safeDistance)
+        // 2. LOGIKA MENJAGA JARAK (Mengecoh Pemain)
+        if (distanceToPlayer < preferredRange - 0.8f)
         {
-            // Jika player terlalu dekat, Tuyul merangkak mundur lincah ke belakang
-            rb.velocity = new Vector2(-directionX * moveSpeed * 1.2f, rb.velocity.y);
+            // Jika Player terlalu dekat, Tuyul panik dan merangkak mundur dengan sangat cepat
+            rb.velocity = new Vector2((-directionX * moveSpeed * 1.4f) + zigZagOffset, rb.velocity.y);
         }
         else
         {
-            // Gerakan merangkak acak mendekati (ditambah gaya kosinus untuk efek zig-zag meliuk)
-            float zigZagY = Mathf.Cos(Time.time * scrambleFrequency) * scrambleMagnitude;
-            rb.velocity = new Vector2(directionX * moveSpeed + (zigZagSign * 2f), rb.velocity.y);
+            // Jika jarak aman, dia merangkak maju meliuk-liuk acak mendekati posisi ideal
+            rb.velocity = new Vector2((directionX * moveSpeed) + zigZagOffset, rb.velocity.y);
         }
 
-        // Putar arah hadap berdasarkan arah gerak fisika Rigidbody-nya
-        transform.localScale = new Vector3(rb.velocity.x > 0 ? -Mathf.Abs(transform.localScale.x) : Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+        // 3. Mengatur arah hadap visual berdasarkan arah jalannya fisika Rigidbody
+        FlipSprite(rb.velocity.x);
 
-        // Peluang acak menyerang tiba-tiba jika dalam jarak ideal
-        if (distanceToPlayer <= 4f && Random.Range(0, 500) == 5)
+        // 4. KEPUTUSAN MENYERANG SECARA ACAK (Arah Sulit Ditebak)
+        attackDecisionTimer -= Time.deltaTime;
+        if (attackDecisionTimer <= 0 && distanceToPlayer <= preferredRange + 1f)
         {
-            ChangeState(EnemyState.Attack);
-            stateTimer = 0.5f; // Ancang-ancang atlet lari
-            rb.velocity = Vector2.zero;
-            if (anim != null) anim.SetTrigger("TelegraphAttack");
+            attackDecisionTimer = attackCheckCooldown; // Reset timer keputusan
+
+            // Peluang 60% untuk mengeksekusi serangan dadakan saat durasi cooldown habis
+            if (Random.value < 0.6f)
+            {
+                rb.velocity = Vector2.zero; // Rem instan di tempat
+                ChangeState(EnemyState.Attack);
+                
+                // Masuk Fase 1: Telegraph (Posisi atlet siap start)
+                currentPhase = AttackPhase.Telegraph;
+                phaseTimer = telegraphDuration;
+                if (anim != null) anim.SetTrigger("TelegraphSprint");
+            }
         }
     }
 
     protected override void UpdateAttackState()
     {
-        stateTimer -= Time.deltaTime;
+        phaseTimer -= Time.deltaTime;
 
-        if (stateTimer <= 0)
+        switch (currentPhase)
         {
-            // SERANGAN TAK TERTEBAK: Melompat menerjang dengan lintasan melengkung parabola ke arah player
-            float jumpDir = playerTransform.position.x > transform.position.x ? 1f : -1f;
-            rb.velocity = new Vector2(jumpDir * moveSpeed * 2.5f, 6f);
-            
-            // Masuk kembali ke pola acak setelah mendarat
-            ChangeState(EnemyState.Move);
+            // ==========================================
+            // FASE 1: ANNCANG-ANCANG ATLET (Telegraph)
+            // ==========================================
+            case AttackPhase.Telegraph:
+                rb.velocity = new Vector2(0f, rb.velocity.y); // Kunci posisi diam di lantai
+
+                if (phaseTimer <= 0)
+                {
+                    currentPhase = AttackPhase.Pouncing;
+                    phaseTimer = pounceDuration;
+
+                    // Kunci arah target terkaman
+                    lockedDirection = playerTransform.position.x > transform.position.x ? 1f : -1f;
+                    FlipSprite(lockedDirection);
+
+                    // TRIK TIDAK BISA DITEBAK: Acak tinggi lompatan vertikalnya secara drastis!
+                    // Kadang Tuyul menerkam rendah lurus, kadang melompat melambung tinggi ke atas (Parabola)
+                    randomizedJumpForceY = Random.Range(minPounceForceY, maxPounceForceY);
+
+                    // Tembakkan fisik seperti terkaman kucing garong
+                    rb.velocity = new Vector2(lockedDirection * basePounceForceX, randomizedJumpForceY);
+                    
+                    if (anim != null) anim.SetTrigger("Pounce");
+                }
+                break;
+
+            // ==========================================
+            // FASE 2: TERKAMAN PARABOLA (Pouncing / In Air)
+            // ==========================================
+            case AttackPhase.Pouncing:
+                // Biarkan fisika Unity mengontrol lintasan parabolanya di udara
+                if (phaseTimer <= 0)
+                {
+                    currentPhase = AttackPhase.Recover;
+                    phaseTimer = 0.3f; // Jeda pemulihan mendarat singkat
+                    rb.velocity = new Vector2(0f, rb.velocity.y); // Rem gesekan horizontal saat mendarat
+                }
+                break;
+
+            // ==========================================
+            // FASE 3: MENDARAT & SIAP KELUAR (Recover)
+            // ==========================================
+            case AttackPhase.Recover:
+                rb.velocity = new Vector2(0f, rb.velocity.y);
+
+                if (phaseTimer <= 0)
+                {
+                    // Kembali merangkak acak mengecoh pemain
+                    ChangeState(EnemyState.Move);
+                }
+                break;
         }
+    }
+
+    // Override fungsi mati untuk disesuaikan dengan efek kepulan asap & mengeong
+    protected override void Die()
+    {
+        isDead = true;
+        currentState = EnemyState.Dead;
+        rb.velocity = Vector2.zero;
+
+        Debug.Log("Tuyul Kalah: *Poof* (Kepulan asap kecil) + *Mengeong sangat kecil*");
+        
+        if (anim != null) anim.SetTrigger("PoofDeath");
+
+        // Memanggil sistem drop item modular kita
+        if (dropSystem != null) dropSystem.DropRandomItem(transform.position);
+
+        Destroy(gameObject, 0.4f); // Hancurkan objek setelah efek asap selesai
+    }
+
+    private void FlipSprite(float horizontalVelocity)
+    {
+        if (horizontalVelocity > 0.2f)
+            transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+        else if (horizontalVelocity < -0.2f)
+            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
     }
 }
