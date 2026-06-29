@@ -375,7 +375,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3143241177659123197, guid: 0271f96778b19a84db7054e399747370, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1129,7 +1129,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 16.016975, y: 21.82}
+  m_Size: {x: 8.599113, y: 17.910002}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -1181,14 +1181,13 @@ MonoBehaviour:
   enemyContactDamage: 15
   iFrameDuration: 0.8
   activeBuff: 0
-  attackCancelThreshold: 0.7
   dashCancelThreshold: 0.6
   staggerCancelThreshold: 0.7
   timeToTurnScary: 10
   moveSpeed: 8
   jumpForce: 12
   dashSpeed: 20
-  dashDuration: 0.2
+  dashDuration: 0.3
   dashCooldown: 0.5
   groundCheckPoint: {fileID: 5776198585862739901}
   groundCheckSize: {x: 0.54, y: 0}
@@ -2305,7 +2304,6 @@ MonoBehaviour:
   enemyContactDamage: 15
   iFrameDuration: 0.8
   activeBuff: 0
-  attackCancelThreshold: 0.7
   dashCancelThreshold: 0.6
   staggerCancelThreshold: 0.7
   timeToTurnScary: 10

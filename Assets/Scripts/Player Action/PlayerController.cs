@@ -36,7 +36,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private int maxHealth = 100;
     [SerializeField] private int currentHealth;
     [SerializeField] private Slider hpSlider;
-    [SerializeField] private float baseAttackDuration = 0.7f;
+    [SerializeField] private float baseAttackDuration = 1f;
     private float currentAttackDuration; // Durasi serangan yang bisa disesuaikan dengan multiplier
     private bool isAttackBuffered = false; // Menyimpan antrean klik selanjutnya
     [SerializeField] private float attackSpeedMultiplier = 1f;
@@ -44,7 +44,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform attackPoint;      
     [SerializeField] private float attackRange = 0.6f;
     [SerializeField] private int attackDamage = 25;
-    [SerializeField] private float comboResetDelay = 1.5f; // Batas waktu toleransi jeda klik antar combo
+    [SerializeField] private float comboResetDelay = 2.5f; // Batas waktu toleransi jeda klik antar combo
     private float comboResetTimer;
     [SerializeField] private LayerMask enemyLayer; // Layer khusus untuk mendeteksi Musuh
     [SerializeField] private int enemyContactDamage = 15; // Damage saat menyenggol musuh
@@ -58,7 +58,6 @@ public class PlayerController : MonoBehaviour
     private bool isInvincible = false; // Penanda efek kebal peci haji
 
     [Header("Animation Cancelling Settings")]
-    [SerializeField] private float attackCancelThreshold = 0.9f;  // Bisa cancel setelah 90% animasi selesai
     [SerializeField] private float dashCancelThreshold = 0.6f;    // Dash bisa cancel Attack setelah 60% animasi
     [SerializeField] private float staggerCancelThreshold = 0.7f; // Bisa cancel Stagger setelah 70% animasi
 
@@ -135,16 +134,6 @@ public class PlayerController : MonoBehaviour
         // Membaca input jalan (A/D)
         horizontalInput = gameInput.Player.Move.ReadValue<Vector2>().x;
 
-        // // Jika sistem input error/stuck, cek kondisi fisik keyboard pemain
-        // if (Keyboard.current != null)
-        // {
-        //     // Jika tombol A dan tombol D secara FISIK tidak sedang ditekan oleh jari pemain
-        //     if (!Keyboard.current.aKey.isPressed && !Keyboard.current.dKey.isPressed)
-        //     {
-        //         horizontalInput = 0f; // Paksa reset ke 0 agar tidak ghosting/jalan sendiri
-        //     }
-        // }
-
         anim.SetBool("isRunning", Mathf.Abs(horizontalInput) > 0.1f);
 
         FlipController();
@@ -195,25 +184,30 @@ public class PlayerController : MonoBehaviour
                 break;
 
             case PlayerState.Attack:
-                stateTimer -= Time.deltaTime;
-    
-                // SISTEM BUFFER JALAN: Jika animasi hampir selesai dan ada antrean klik, langsung sambung combo!
-                if (stateTimer <= currentAttackDuration * (1f - attackCancelThreshold) && isAttackBuffered)
+                // Ambil data properti animasi yang sedang aktif berjalan di Layer 0
+                AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0);
+
+                // Pastikan Animator memang sedang memutar salah satu dari 3 animasi attack kamu
+                if (stateInfo.IsName("Player_Attack 1") || stateInfo.IsName("Player_Attack 2") || stateInfo.IsName("Player_Attack 3"))
                 {
-                    isAttackBuffered = false;
-                    if (attackComboCount < 3)
+                    // KALIBRASI VISUAL: Jika sprite sudah selesai diputar 95% (hampir tuntas)
+                    if (stateInfo.normalizedTime >= 0.95f)
                     {
-                        attackComboCount++;
-                        Debug.Log($"Combo Berlanjut: #{attackComboCount}");
-                        ChangeState(PlayerState.Attack);
+                        // Jika pemain melakukan spam klik selama sabetan tadi berjalan, sambung kombo secara rapi!
+                        if (isAttackBuffered && attackComboCount < 3)
+                        {
+                            isAttackBuffered = false;
+                            attackComboCount++;
+                            Debug.Log($"Kombo Menyambung Rapi ke: #{attackComboCount}");
+                            ChangeState(PlayerState.Attack);
+                        }
+                        else
+                        {
+                            // Jika tidak ada input spam baru, kembali ke Idle dan nyalakan toleransi jeda waktu kombo
+                            comboResetTimer = comboResetDelay; 
+                            ChangeState(PlayerState.Idle);
+                        }
                     }
-                }
-                else if (stateTimer <= 0)
-                {
-                    // KUNCI SUTRADARA: Ketika waktu habis, karakter kembali ke Idle, 
-                    // tapi JANGAN LANGSUNG RESET combo ke 0. Berikan waktu toleransi tunggu!
-                    comboResetTimer = comboResetDelay; 
-                    ChangeState(PlayerState.Idle);
                 }
                 break;
 
@@ -279,8 +273,10 @@ public class PlayerController : MonoBehaviour
             case PlayerState.Move:
             case PlayerState.Airborne:
             case PlayerState.Stealth:
-            case PlayerState.Attack:
                 rb.velocity = new Vector2(horizontalInput * moveSpeed, rb.velocity.y);
+                break;
+            case PlayerState.Attack:
+                rb.velocity = new Vector2(rb.velocity.x * 0.8f, rb.velocity.y);
                 break;
 
             case PlayerState.Dash:
@@ -331,17 +327,23 @@ public class PlayerController : MonoBehaviour
                 break;
 
             case PlayerState.Airborne:
-                // Tidak perlu memanggil anim.Play jika transisi "isGrounded = false" sudah diatur di Animator
+                anim.Play("Player_AirboneBody");
                 break;
 
             case PlayerState.Attack:
                 anim.speed = attackSpeedMultiplier;
 
-                currentAttackDuration = baseAttackDuration / attackSpeedMultiplier; // Sesuaikan durasi serangan dengan multiplier kecepatan
-                stateTimer = currentAttackDuration; // Set timer berdasarkan durasi serangan yang disesuaikan
+                currentAttackDuration = baseAttackDuration / attackSpeedMultiplier; 
+                stateTimer = currentAttackDuration; 
+
+                // KUNCI UTAMA: Kirim data angka combo ke parameter Int Animator sebelum memicu trigger!
+                anim.SetInteger("comboStep", attackComboCount);
 
                 anim.SetTrigger("Attack");
                 ExecuteAttackDamage();
+
+                float nudgeDir = isFacingRight ? 1f : -1f;
+                rb.velocity = new Vector2(nudgeDir * 2.8f, rb.velocity.y); 
                 break;
 
             case PlayerState.Dash:
@@ -376,16 +378,20 @@ public class PlayerController : MonoBehaviour
     // GETTER: Untuk akses combo count dari script lain (UI display, etc)
     public int GetComboCount() => attackComboCount;
 
-    // HELPER METHOD: Cek apakah current state bisa di-cancel berdasarkan progress animasi
     private bool CanCancelState(PlayerState stateToCheck, float cancelThreshold)
     {
         if (currentState != stateToCheck) return false;
 
-        // MEMBALIK RUMUS: Hitung progress waktu yang SUDAH BERJALAN (0 = baru mulai, 1 = selesai)
+        // Jika yang dicek adalah Attack, baca progress-nya langsung dari Animator
+        if (stateToCheck == PlayerState.Attack)
+        {
+            return anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= cancelThreshold;
+        }
+
+        // Untuk state selain attack (seperti Stagger/Dash), tetap gunakan rumus timer C# asli
         float timePassed = GetStateDuration(stateToCheck) - stateTimer;
         float animationProgress = timePassed / GetStateDuration(stateToCheck);
         
-        // Bisa cancel jika sudah melewati threshold
         return animationProgress >= cancelThreshold;
     }
 
@@ -404,13 +410,21 @@ public class PlayerController : MonoBehaviour
     // 3. LOGIKA KETIKA TOMBOL INPUT DI TEKAN
     private void OnJumpInput()
     {
-        afkTimer = 0f;
+        afkTimer = 0f; // Reset waktu AFK
 
-        // Berdasarkan FSM: Hanya boleh lompat saat di posisi Idle, Move, atau Stealth
-        if ((currentState == PlayerState.Idle || currentState == PlayerState.Move || currentState == PlayerState.Stealth) && isGrounded)
+        if (currentState == PlayerState.Scary)
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
             ChangeState(PlayerState.Airborne);
+            anim.Play("Player_AirboneBody"); // Paksa visual langsung ganti ke animasi lompat
+            return; // Keluar dari fungsi agar kode di bawah tidak dieksekusi lagi
+        }
+
+        if ((currentState == PlayerState.Idle || currentState == PlayerState.Move || currentState == PlayerState.Stealth || currentState == PlayerState.Attack) && isGrounded)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            ChangeState(PlayerState.Airborne);
+            anim.Play("Player_AirboneBody"); 
         }
     }
 
@@ -422,7 +436,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // ANIMATION CANCELLING: Dash bisa membatalkan Attack atau Stagger jika sudah melewati cancel point
-        if (CanCancelState(PlayerState.Attack, dashCancelThreshold))
+        if (currentState == PlayerState.Attack || CanCancelState(PlayerState.Attack, dashCancelThreshold))
         {
             Debug.Log("Dash Cancel Attack!");
             ChangeState(PlayerState.Dash);
@@ -445,30 +459,38 @@ public class PlayerController : MonoBehaviour
 
     private void OnAttackInput()
     {
+        afkTimer = 0f; // Reset waktu AFK
+
+        // FASE A: Jika pemain mengklik AKTIF saat animasi attack sebelumnya sedang berjalan (Rapid Click/Buffer)
         if (currentState == PlayerState.Attack)
         {
-            if (attackComboCount < 3)
+            if (attackComboCount < 3 && !isAttackBuffered)
             {
                 isAttackBuffered = true;
+                Debug.Log($"Klik cepat dideteksi! Antrean combo berikutnya disimpan.");
             }
             return;
         }
 
-        if (currentState == PlayerState.Idle || currentState == PlayerState.Move || currentState == PlayerState.Stealth || currentState == PlayerState.Airborne)
+        // FASE B: Jika pemain mengklik saat posisi Idle/Jalan (Bisa Attack baru ATAU kelanjutan dari jeda Idle)
+        if (currentState == PlayerState.Idle || currentState == PlayerState.Move || currentState == PlayerState.Stealth || currentState == PlayerState.Airborne || currentState == PlayerState.Scary)
         {
-            // JIKA MASIH DALAM WAKTU TOLERANSI: Klik santai akan melanjutkan combo berikutnya!
-            if (attackComboCount > 0 && attackComboCount < 3)
             {
-                attackComboCount++;
-                Debug.Log($"Klik Jeda Santai Sukses! Lanjut Combo #{attackComboCount}");
-            }
-            else
-            {
-                attackComboCount = 1; // Mulai serangan baru dari awal jika sudah lewat batas reset
-            }
+                // Jika timer toleransi jeda masih aktif, naikkan tingkat combo
+                if (attackComboCount > 0 && attackComboCount < 3)
+                {
+                    attackComboCount++;
+                    Debug.Log($"Melanjutkan combo setelah jeda! Lanjut ke Langkah #{attackComboCount}");
+                }
+                else
+                {
+                    attackComboCount = 1; // Mulai dari awal jika jeda toleransi sudah hangus
+                    Debug.Log("Mulai serangan baru dari Awal (Combo #1)");
+                }
 
-            isAttackBuffered = false;
-            ChangeState(PlayerState.Attack);
+                isAttackBuffered = false;
+                ChangeState(PlayerState.Attack);
+            }
         }
     }
 
