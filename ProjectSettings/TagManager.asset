@@ -58,14 +58,14 @@ TagManager:
   - name: Ground
     uniqueID: 12405065
     locked: 0
-  - name: Pole
-    uniqueID: 2002038019
-    locked: 0
   - name: Tree-In-Back-Char
     uniqueID: 1203352619
     locked: 0
   - name: Vegetable-In-Back-Char
     uniqueID: 1267535387
+    locked: 0
+  - name: Pole
+    uniqueID: 2002038019
     locked: 0
   - name: Char-Enemy
     uniqueID: 2058695955
