@@ -142,7 +142,7 @@ SpriteRenderer:
   m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.6650944, g: 0.66195714, b: 0.66195714, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -178,7 +178,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &6082198469894709392
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -258,13 +258,13 @@ MonoBehaviour:
   aggroRange: 5
   playerLayer:
     serializedVersion: 2
-    m_Bits: 0
-  preferredRange: 3.5
-  zigZagFrequency: 8
+    m_Bits: 256
+  preferredRange: 2
+  zigZagFrequency: 5
   zigZagMagnitude: 4
   attackCheckCooldown: 1.5
   telegraphDuration: 0.4
   pounceDuration: 0.4
   basePounceForceX: 8
-  minPounceForceY: 4
-  maxPounceForceY: 8
+  minPounceForceY: 5
+  maxPounceForceY: 9

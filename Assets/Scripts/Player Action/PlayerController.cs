@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
     public enum PlayerState
     {
         Idle,
+        Scary,
         Move,
         Airborne,
         Attack,
@@ -57,11 +58,12 @@ public class PlayerController : MonoBehaviour
     private bool isInvincible = false; // Penanda efek kebal peci haji
 
     [Header("Animation Cancelling Settings")]
-    [SerializeField] private float attackCancelThreshold = 0.7f;  // Bisa cancel setelah 50% animasi selesai
+    [SerializeField] private float attackCancelThreshold = 0.9f;  // Bisa cancel setelah 90% animasi selesai
     [SerializeField] private float dashCancelThreshold = 0.6f;    // Dash bisa cancel Attack setelah 60% animasi
     [SerializeField] private float staggerCancelThreshold = 0.7f; // Bisa cancel Stagger setelah 70% animasi
 
     [Header("Movement Settings")]
+    [SerializeField] private float timeToTurnScary = 10f;
     [SerializeField] private float moveSpeed = 8f;
     [SerializeField] private float jumpForce = 12f;
     [SerializeField] private float dashSpeed = 20f;
@@ -69,6 +71,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float dashCooldown = 0.5f; // Durasi cooldown dalam detik
     private float dashCooldownTimer; // Timer yang akan menghitung mundur
     private bool canDash = true; // Penanda status boleh dash
+    private float afkTimer; // Penghitung mundur waktu diam pemain
 
     [Header("Ground Check")]
     [SerializeField] private Transform groundCheckPoint;
@@ -141,6 +144,7 @@ public class PlayerController : MonoBehaviour
         //         horizontalInput = 0f; // Paksa reset ke 0 agar tidak ghosting/jalan sendiri
         //     }
         // }
+
         anim.SetBool("isRunning", Mathf.Abs(horizontalInput) > 0.1f);
 
         FlipController();
@@ -159,6 +163,12 @@ public class PlayerController : MonoBehaviour
         switch (currentState)
         {
             case PlayerState.Idle:
+                afkTimer += Time.deltaTime;
+                if (afkTimer >= timeToTurnScary)
+                {
+                    ChangeState(PlayerState.Scary);
+                }
+
                 if (Mathf.Abs(horizontalInput) > 0.1f) ChangeState(PlayerState.Move);
                 if (!isGrounded && rb.velocity.y < -0.1f) ChangeState(PlayerState.Airborne);
                 break;
@@ -173,6 +183,14 @@ public class PlayerController : MonoBehaviour
                 if (isGrounded && Mathf.Abs(rb.velocity.y) < 0.1f)
                 {
                     ChangeState(Mathf.Abs(horizontalInput) > 0.1f ? PlayerState.Move : PlayerState.Idle);
+                }
+                break;
+
+            case PlayerState.Scary:
+                // Jika sedang scary lalu pemain mulai menggerakkan karakter
+                if (Mathf.Abs(horizontalInput) > 0.1f)
+                {
+                    ChangeState(PlayerState.Move);
                 }
                 break;
 
@@ -289,6 +307,12 @@ public class PlayerController : MonoBehaviour
             anim.SetBool("isStagger", false);
         }
 
+        // Matikan parameter isScary di Animator setiap kali keluar dari state Scary
+        if (currentState == PlayerState.Scary)
+        {
+            anim.SetBool("isScary", false);
+        }
+
         // Reset kecepatan animasi ke normal setiap ganti state
         anim.speed = 1f; 
 
@@ -298,10 +322,12 @@ public class PlayerController : MonoBehaviour
         {
             case PlayerState.Idle:
                 // Transisi diatur otomatis oleh parameter isRunning & isGrounded di Update
+                afkTimer = 0f;
                 break;
 
             case PlayerState.Move:
                 // Transisi diatur otomatis oleh parameter isRunning & isGrounded di Update
+                afkTimer = 0f;
                 break;
 
             case PlayerState.Airborne:
@@ -340,6 +366,10 @@ public class PlayerController : MonoBehaviour
                 rb.velocity = Vector2.zero;
                 rb.isKinematic = true;
                 break;
+            case PlayerState.Scary:
+                anim.SetBool("isScary", true);
+                rb.velocity = Vector2.zero;
+                break;
         }
     }
 
@@ -374,6 +404,8 @@ public class PlayerController : MonoBehaviour
     // 3. LOGIKA KETIKA TOMBOL INPUT DI TEKAN
     private void OnJumpInput()
     {
+        afkTimer = 0f;
+
         // Berdasarkan FSM: Hanya boleh lompat saat di posisi Idle, Move, atau Stealth
         if ((currentState == PlayerState.Idle || currentState == PlayerState.Move || currentState == PlayerState.Stealth) && isGrounded)
         {
