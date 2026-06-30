@@ -216,7 +216,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Player_Attack 2
-  m_Speed: 1.5
+  m_Speed: 2
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 4487268971924598677}
@@ -494,7 +494,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Player_Attack 3
-  m_Speed: 1.5
+  m_Speed: 2
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 1280741511422751851}
@@ -622,7 +622,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Player_Attack 1
-  m_Speed: 1.5
+  m_Speed: 2
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 583664736834640506}
@@ -649,7 +649,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Player_Dash
-  m_Speed: 1
+  m_Speed: 2
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 2391378403352289227}
@@ -882,7 +882,7 @@ AnimatorStateMachine:
     m_Position: {x: 480, y: -90, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 1075806017417905768}
-    m_Position: {x: 730, y: -90, z: 0}
+    m_Position: {x: 740, y: -90, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -260799308423960242}
     m_Position: {x: 320, y: 240, z: 0}
