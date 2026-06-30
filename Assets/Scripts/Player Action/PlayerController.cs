@@ -63,11 +63,15 @@ public class PlayerController : MonoBehaviour
 
     [Header("Movement Settings")]
     [SerializeField] private float timeToTurnScary = 10f;
-    [SerializeField] private float moveSpeed = 8f;
+    [SerializeField] private float moveSpeed = 10f;
     [SerializeField] private float jumpForce = 12f;
     [SerializeField] private float dashSpeed = 20f;
     [SerializeField] private float dashDuration = 0.2f;
     [SerializeField] private float dashCooldown = 0.5f; // Durasi cooldown dalam detik
+    [SerializeField] private float stealthDuration = 6f;
+    [SerializeField] private float stealthCooldown = 10f; // Durasi cooldown 
+    private float stealthCooldownTimer;
+    private bool canStealth = true;
     private float dashCooldownTimer; // Timer yang akan menghitung mundur
     private bool canDash = true; // Penanda status boleh dash
     private float afkTimer; // Penghitung mundur waktu diam pemain
@@ -148,6 +152,16 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        if (!canStealth)
+        {
+            stealthCooldownTimer -= Time.deltaTime;
+            if (stealthCooldownTimer <= 0)
+            {
+                canStealth = true;
+                Debug.Log("Stealth siap digunakan lagi!");
+            }
+        }
+
         // LOGIKA UPDATE BERDASARKAN STATE
         switch (currentState)
         {
@@ -213,9 +227,11 @@ public class PlayerController : MonoBehaviour
 
             case PlayerState.Dash:
             case PlayerState.Stagger:
+            case PlayerState.Stealth: 
                 stateTimer -= Time.deltaTime;
                 if (stateTimer <= 0)
                 {
+                    // Jika waktu habis, otomatis kembali berdiri tegak (Idle)
                     ChangeState(PlayerState.Idle);
                 }
                 break;
@@ -229,6 +245,7 @@ public class PlayerController : MonoBehaviour
                 attackComboCount = 0; // Combo baru resmi hangus jika pemain mendiamkan karakter lewat dari 0.5 detik
                 Debug.Log("Waktu jeda habis, combo di-reset ke 0.");
             }
+        }
             
             // HITUNG MUNDUR DURASI BUFF AKTIF
             if (activeBuff != BuffType.None)
@@ -239,7 +256,6 @@ public class PlayerController : MonoBehaviour
                     ResetPlayerStats(); // Kembalikan ke normal jika waktu habis
                 }
             }
-        }
 
         if (iFrameTimer > 0)
         {
@@ -247,13 +263,12 @@ public class PlayerController : MonoBehaviour
         }
 
         // Cek sentuhan musuh hanya jika player TIDAK sedang kebal, TIDAK mati, dan TIDAK kebal peci haji (Aegis)
-        if (iFrameTimer <= 0 && currentState != PlayerState.Dead && currentState != PlayerState.Dash && !isInvincible)
+        if (iFrameTimer <= 0 && currentState != PlayerState.Dead && currentState != PlayerState.Dash && currentState != PlayerState.Stealth && !isInvincible)
         {
             // Membuat kotak sensor fiktif setinggi tubuh player (Lebar: 0.6, Tinggi: 1.2)
             // Catatan: Jika pivot karaktermu ada di kaki, naikkan posisi pusat kotak sedikit ke atas (+ 0.6f)
             Vector2 playerCenter = new Vector2(transform.position.x, transform.position.y + 0.6f);
             Collider2D touchingEnemy = Physics2D.OverlapBox(playerCenter, new Vector2(0.6f, 1.2f), 0f, enemyLayer);
-
             if (touchingEnemy != null)
             {
                 TakeDamage(enemyContactDamage); // Player otomatis terluka karena menyenggol musuh!
@@ -297,10 +312,19 @@ public class PlayerController : MonoBehaviour
     {
         if (currentState == PlayerState.Dead) return;
 
+
         // Pastikan centangan isStagger mati setiap kali karakter keluar dari state Stagger
         if (currentState == PlayerState.Stagger)
         {
             anim.SetBool("isStagger", false);
+        }
+
+        // Kembalikan badan karakter menjadi padat/normal jika keluar dari mode Stealth
+        if (currentState == PlayerState.Stealth)
+        {
+            SetSpriteAlpha(1f); 
+            canStealth = false;
+            stealthCooldownTimer = stealthCooldown;
         }
 
         // Matikan parameter isScary di Animator setiap kali keluar dari state Scary
@@ -361,6 +385,9 @@ public class PlayerController : MonoBehaviour
 
             case PlayerState.Stealth:
                 // Bisa tambah logic untuk stealth mode di sini
+                SetSpriteAlpha(0.5f); 
+                stateTimer = stealthDuration;
+                afkTimer = 0f;
                 break;
 
             case PlayerState.Dead:
@@ -496,6 +523,14 @@ public class PlayerController : MonoBehaviour
 
     private void OnStealthInput()
     {
+        afkTimer = 0f; // Reset waktu AFK
+
+        if (!canStealth && currentState != PlayerState.Stealth)
+        {
+            Debug.Log($"Stealth masih cooldown! Sisa waktu: {Mathf.CeilToInt(stealthCooldownTimer)} detik.");
+            return;
+        }
+
         if (currentState == PlayerState.Idle || currentState == PlayerState.Move)
         {
             ChangeState(PlayerState.Stealth);
@@ -642,7 +677,7 @@ public class PlayerController : MonoBehaviour
                 break;
 
             case BuffType.Berserk:
-                attackSpeedMultiplier = 1.3f; // Kopi bapak: Animasi serang dipercepat 30%
+                attackSpeedMultiplier = 2f; // Kopi bapak: Animasi serang dipercepat 30%
                 Debug.Log("Buff Berserk Aktif: Sabetan sarung lebih cepat!");
                 break;
 
@@ -662,5 +697,17 @@ public class PlayerController : MonoBehaviour
         isInvincible = false;      // Matikan mode kebal
         iFrameTimer = 0f;          // Reset timer kebal
         Debug.Log("Durasi buff habis, status player kembali normal.");
+    }
+
+    // Fungsi pembantu untuk mengubah nilai transparansi (Alpha) karakter
+    private void SetSpriteAlpha(float alpha)
+    {
+        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null)
+        {
+            Color color = spriteRenderer.color;
+            color.a = alpha; // Mengubah nilai Alpha (transparansi)
+            spriteRenderer.color = color;
+        }
     }
 }
