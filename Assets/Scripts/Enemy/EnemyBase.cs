@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class EnemyBase : MonoBehaviour
 {
-    public enum EnemyState { Idle, Move, Attack, Dead }
+    public enum EnemyState { Idle, Move, Attack, Stagger,Dead }
 
     [Header("Base Enemy Stats")]
     [SerializeField] protected int maxHealth = 50;
@@ -14,6 +14,11 @@ public class EnemyBase : MonoBehaviour
     [SerializeField] protected float aggroRange = 5f; // jarak musuh melihat player
     [SerializeField] protected LayerMask playerLayer;
     protected Transform playerTransform;
+
+    [Header("Stagger & Knockback Settings")]
+    [SerializeField] protected float staggerDuration = 0.35f;
+    [SerializeField] protected float knockbackForceX = 5f;
+    [SerializeField] protected float knockbackForceY = 3f;
 
     protected Rigidbody2D rb;
     protected Animator anim;
@@ -46,6 +51,35 @@ public class EnemyBase : MonoBehaviour
             case EnemyState.Idle: UpdateIdleState(); break;
             case EnemyState.Move: UpdateMoveState(); break;
             case EnemyState.Attack: UpdateAttackState(); break;
+            case EnemyState.Stagger: UpdateStaggerState(); break; // [TAMBAHKAN INI]
+        }
+    }
+
+    // Mengatur pergerakan hantu selama masa pusing akibat sabetan sarung
+    protected virtual void UpdateStaggerState()
+    {
+        stateTimer -= Time.deltaTime;
+
+        if (rb != null)
+        {
+            // Trik Pengaman khusus Kuntilanak: Karena Kuntilanak melayang (tidak punya gravitasi),
+            // kita harus mengerem sumbu Y-nya juga agar dia tidak melayang ke atas langit selamanya saat kena hit.
+            if (rb.gravityScale == 0f)
+            {
+                rb.velocity = new Vector2(rb.velocity.x * 0.85f, rb.velocity.y * 0.85f);
+            }
+            else
+            {
+                // Untuk hantu darat (Pocong, Genderuwo, Tuyul), cukup rem gesekan horizontalnya saja
+                rb.velocity = new Vector2(rb.velocity.x * 0.85f, rb.velocity.y);
+            }
+        }
+
+        // Jika waktu pusingnya sudah habis, bangunkan hantu kembali ke mode normal
+        if (stateTimer <= 0)
+        {
+            // Jika player masih dekat, langsung emosi mengejar (Move), jika jauh kembali diam (Idle)
+            ChangeState(IsPlayerInAggroRange() ? EnemyState.Move : EnemyState.Idle);
         }
     }
 
@@ -66,7 +100,31 @@ public class EnemyBase : MonoBehaviour
         currentHealth -= damage;
         Debug.Log($"{gameObject.name} Kena Hit! Sisa HP: {currentHealth}");
 
-        if (currentHealth <= 0) Die();
+        if (currentHealth <= 0)
+        {
+            Die();
+            return;
+        }
+
+        // Jika masih hidup, berikan efek knockback ke musuh
+        if (playerTransform != null)
+        {
+            // Tentukan arah: jika posisi hantu lebih besar dari player, dorong ke kanan (1), jika tidak ke kiri (-1)
+            float knockbackDir = transform.position.x > playerTransform.position.x ? 1f : -1f;
+
+            // Berikan gaya dorong instan ke Rigidbody2D musuh
+            if (rb != null)
+            {
+                rb.velocity = new Vector2(knockbackDir * knockbackForceX, knockbackForceY);
+            }
+        }
+
+        // Pindahkan state hantu ke Stagger dan nyalakan timernya
+        stateTimer = staggerDuration;
+        ChangeState(EnemyState.Stagger);
+
+        // Mainkan animasi terkejut/stagger di Animator hantu (jika ada parameternya)
+        if (anim != null) anim.SetTrigger("Stagger");
     }
 
     protected virtual void Die()
