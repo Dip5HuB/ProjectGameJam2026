@@ -405,6 +405,8 @@ public class PlayerController : MonoBehaviour
     // GETTER: Untuk akses combo count dari script lain (UI display, etc)
     public int GetComboCount() => attackComboCount;
 
+    public PlayerState GetCurrentState() => currentState;
+
     public float GetStealthFillAmount()
     {
         // 1. Jika sedang dalam mode ghaib, fill dikuras habis (0)
