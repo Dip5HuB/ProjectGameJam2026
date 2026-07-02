@@ -4,7 +4,7 @@ using UnityEngine;
 public class PlayerAudioHandler : MonoBehaviour
 {
     private AudioSource audioSource;
-    private PlayerController playerController; // [KODE BARU] Referensi ke skrip utama
+    private PlayerController playerController; 
 
     [Header("Audio Clips")]
     [SerializeField] private AudioClip jumpSound;
@@ -24,7 +24,6 @@ public class PlayerAudioHandler : MonoBehaviour
     private void Awake()
     {
         audioSource = GetComponent<AudioSource>();
-        // [KODE BARU] Otomatis mengambil skrip PlayerController pada Game Object yang sama
         playerController = GetComponent<PlayerController>(); 
         audioSource.playOnAwake = false;
     }
@@ -36,14 +35,8 @@ public class PlayerAudioHandler : MonoBehaviour
 
     private void HandleFootstepsWithTimer()
     {
-        // Pengaman: Jika skrip player tidak ditemukan, hentikan fungsi
         if (playerController == null) return;
 
-        // =====================================================================
-        // KUNCI UTAMA SINKRONISASI:
-        // Suara langkah kaki HANYA BOLEH berbunyi jika player berada di State MOVE!
-        // Jika sedang Attack, Dash, Scary, atau Stagger, suara otomatis terkunci.
-        // =====================================================================
         if (playerController.GetCurrentState() == PlayerController.PlayerState.Move)
         {
             footstepTimer -= Time.deltaTime;
@@ -56,7 +49,6 @@ public class PlayerAudioHandler : MonoBehaviour
         }
         else
         {
-            // Reset timer ke 0 agar saat kembali jalan langsung berbunyi tanpa jeda delay
             footstepTimer = 0f; 
         }
     }
@@ -69,17 +61,29 @@ public class PlayerAudioHandler : MonoBehaviour
         PlaySound(footstepSounds[randomIndex]);
     }
 
-    // Fungsi pemicu suara aksi lainnya (Tetap dipanggil lewat Animation Events)
     public void PlayJumpSound() => PlaySound(jumpSound);
     public void PlayDashSound() => PlaySound(dashSound);
     public void PlayAttackSound() => PlaySound(attackSound);
     public void PlayDeathSound() => PlaySound(deathSound);
 
+    // =====================================================================
+    // BAGIAN YANG DIPERBAIKI: Menghubungkan SFX ke Master Volume Global
+    // =====================================================================
     private void PlaySound(AudioClip clip)
     {
         if (clip == null || audioSource == null) return;
 
+        // Variasi pitch alami agar suara tidak monoton
         audioSource.pitch = Random.Range(1f - pitchRandomness, 1f + pitchRandomness);
-        audioSource.PlayOneShot(clip, soundVolume);
+
+        // KUNCI UTAMA: Kalibrasi Volume Lokal Karakter dikali dengan Master Volume Global
+        float calculatedVolume = soundVolume;
+        if (AudioManager.Instance != null)
+        {
+            calculatedVolume = soundVolume * AudioManager.Instance.GetMasterVolume();
+        }
+
+        // Jalankan audio dengan volume hasil kalibrasi terbaru
+        audioSource.PlayOneShot(clip, calculatedVolume);
     }
 }

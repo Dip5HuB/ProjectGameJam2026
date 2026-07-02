@@ -23,6 +23,8 @@ public class MainMenuManager : MonoBehaviour
     [Header("Scene Settings")]
     [Tooltip("Nama scene yang akan dimuat ketika player menekan tombol Play (Contoh: Map_1)")]
     [SerializeField] private string playSceneName = "Map_1";
+    [Tooltip("Nama scene untuk menu utama kamu")]
+    [SerializeField] private string mainMenuSceneName = "MainMenu";
 
     private void Start()
     {
@@ -40,6 +42,11 @@ public class MainMenuManager : MonoBehaviour
         
         // Memuat scene game berdasarkan nama scene yang dimasukkan di Inspector
         SceneManager.LoadScene(playSceneName);
+    }
+
+    public void MainMenu()
+    {
+        SceneManager.LoadScene(mainMenuSceneName);
     }
 
     /// <summary>

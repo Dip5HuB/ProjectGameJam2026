@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -92,6 +93,7 @@ public class PlayerController : MonoBehaviour
     private float stateTimer;
     private bool isFacingRight = true;
     private int attackComboCount = 0;  // Penghitung combo attack
+    private bool isMap0 = false;
 
     private void Awake()
     {
@@ -123,6 +125,9 @@ public class PlayerController : MonoBehaviour
             hpSlider.maxValue = maxHealth;
             hpSlider.value = currentHealth;
         }
+
+        // Cek apakah scene yang sedang aktif saat ini bernama "Map_0"
+        isMap0 = SceneManager.GetActiveScene().name == "Map_0";
 
         ChangeState(PlayerState.Idle);
     }
@@ -166,10 +171,18 @@ public class PlayerController : MonoBehaviour
         switch (currentState)
         {
             case PlayerState.Idle:
-                afkTimer += Time.deltaTime;
-                if (afkTimer >= timeToTurnScary)
+                // Timer AFK Scary HANYA akan berjalan JIKA BUKAN berada di Map_0
+                if (!isMap0)
                 {
-                    ChangeState(PlayerState.Scary);
+                    afkTimer += Time.deltaTime;
+                    if (afkTimer >= timeToTurnScary)
+                    {
+                        ChangeState(PlayerState.Scary);
+                    }
+                }
+                else
+                {
+                    afkTimer = 0f; // Jaga timer tetap bersih di Map_0
                 }
 
                 if (Mathf.Abs(horizontalInput) > 0.1f) ChangeState(PlayerState.Move);
