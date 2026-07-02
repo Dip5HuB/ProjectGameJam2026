@@ -1,36 +1,36 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UI; // Tetap wajib untuk mendeteksi komponen UI
 
 public class StealthUIHandler : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private PlayerController playerController; // Slot untuk menarik object Player
+    [SerializeField] private PlayerController playerController; // Slot untuk Player
     
-    private Image uiImage; // Menampung komponen Image dari object UI ini sendiri
+    private Slider stealthSlider; // [DIUBAH] Sekarang menggunakan Slider, bukan Image lagi
 
     private void Awake()
     {
-        // Otomatis mengambil komponen Image yang menempel pada object UI ini
-        uiImage = GetComponent<Image>();
+        // Otomatis mengambil komponen Slider yang menempel pada object UI ini
+        stealthSlider = GetComponent<Slider>();
     }
 
     private void Start()
     {
-        // Pastikan di awal game fill dalam kondisi penuh siap pakai
-        if (uiImage != null)
+        // Setel batas aman slider dari angka 0 hingga 1
+        if (stealthSlider != null)
         {
-            uiImage.fillAmount = 1f;
+            stealthSlider.minValue = 0f;
+            stealthSlider.maxValue = 1f;
+            stealthSlider.value = 1f; // Di awal game, setel penuh
         }
     }
 
     private void Update()
     {
-        // Pengaman: Jika player atau image belum terpasang, abaikan agar tidak error
-        if (playerController == null || uiImage == null) return;
+        // Pengaman: Jika player atau slider belum siap, abaikan
+        if (playerController == null || stealthSlider == null) return;
 
-        // TUGAS UTAMA: Mengambil data persentase dari player dan memasukkannya ke visual Fill Amount
-        uiImage.fillAmount = playerController.GetStealthFillAmount();
+        // TUGAS UTAMA: Masukkan data persentase dari player langsung ke value Slider
+        stealthSlider.value = playerController.GetStealthFillAmount();
     }
 }
