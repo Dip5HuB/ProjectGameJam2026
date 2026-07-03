@@ -1033,7 +1033,7 @@ MonoBehaviour:
   settingPanel: {fileID: 1676995569}
   creditsPanel: {fileID: 952794580}
   stagePanel: {fileID: 0}
-  playSceneName: Map_0
+  playSceneName: Scene_Cutscene
   mainMenuSceneName: MainMenu
 --- !u!4 &332632852
 Transform:
