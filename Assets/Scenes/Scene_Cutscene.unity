@@ -707,8 +707,7 @@ MonoBehaviour:
   daftarGambar:
   - {fileID: 21300000, guid: 1e7b2486b0c8bbb4c9b3a4e714541655, type: 3}
   - {fileID: 21300000, guid: 390c853f806c65b459553ee018a0e6f6, type: 3}
-  - {fileID: 21300000, guid: d20fcd56774cda24cafdcfed976d78ce, type: 3}
-  namaMapSelanjutnya: Map_1
+  namaMapSelanjutnya: Map_0
 --- !u!4 &1817761537
 Transform:
   m_ObjectHideFlags: 0
@@ -742,15 +741,13 @@ MonoBehaviour:
   daftarGambar:
   - {fileID: 21300000, guid: 1e7b2486b0c8bbb4c9b3a4e714541655, type: 3}
   - {fileID: 21300000, guid: 390c853f806c65b459553ee018a0e6f6, type: 3}
-  - {fileID: 21300000, guid: d20fcd56774cda24cafdcfed976d78ce, type: 3}
   daftarKalimat:
   - '"Lukman, hurry home. Don''t wander around, the streets are already empty."'
   - '"Yes, Pak Ustad. I''m heading straight home now."'
-  - '"Man, this alley is pitch black. I hope nothing bad happens."'
   kecepatanKetik: 0.04
   jedaSetelahTeksSelesai: 2.5
   waktuFade: 1
-  namaMapSelanjutnya: Map_1
+  namaMapSelanjutnya: Map_0
 --- !u!1 &1841717677
 GameObject:
   m_ObjectHideFlags: 0
