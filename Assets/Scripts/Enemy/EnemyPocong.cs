@@ -164,8 +164,14 @@ public class EnemyPocong : EnemyBase
     private void FlipSprite(float dir)
     {
         if (dir > 0)
-            transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
-        else if (dir < 0)
+        {
+            // Player di sebelah KANAN -> Pocong harus hadap KANAN (Scale X harus POSITIF)
             transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+        }
+        else if (dir < 0)
+        {
+            // Player di sebelah KIRI -> Pocong harus hadap KIRI (Scale X harus NEGATIF)
+            transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+        }
     }
 }
