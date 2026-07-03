@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Asset/Char/Enemy_Kuntilanak/Kunti_Attack.anim.meta
 guid: 799621dfd5476e9428f11cbeed7ab29f
+========
+guid: ba2139a5bd86b674f8f00b9e00bad788
+>>>>>>>> Level-Desain:Assets/Asset/Char/Player/Player_attack 1.anim.meta
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 7400000

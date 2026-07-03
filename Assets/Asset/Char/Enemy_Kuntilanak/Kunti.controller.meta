@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Asset/Char/Enemy_Kuntilanak/Kunti.controller.meta
 guid: e7adefddf1f48674d974cd78014f322e
+========
+guid: 2505e5f85c8179d449731fe7ae4d9273
+>>>>>>>> Level-Desain:Assets/Asset/Char/Player/Player.controller.meta
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 9100000

@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Asset/Char/Enemy_Kuntilanak/Kunti_Move.anim.meta
 guid: 4482641bffb93d24c8994b1713e337d4
+========
+guid: 2ed311d7ff8bed9479c809cc8329b654
+>>>>>>>> Level-Desain:Assets/Asset/Char/Player/Player_dash.anim.meta
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 7400000
