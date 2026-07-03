@@ -1,33 +1,31 @@
 using UnityEngine;
-using UnityEngine.SceneManagement; // WAJIB untuk fungsi Restart/Load ulang game
+using UnityEngine.SceneManagement; 
 
 public class GameOverManager : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private PlayerController playerController;
-    [SerializeField] private GameObject gameOverPanel; // Seret Panel UI Game Over kamu ke sini
+    [SerializeField] private GameObject gameOverPanel; 
 
     [Header("Dramatic Settings")]
-    [Range(0.1f, 0.5f)] [SerializeField] private float slowMoFactor = 0.25f; // Semakin kecil, semakin lambat waktunya
-    
+    [Range(0.1f, 0.5f)] [SerializeField] private float slowMoFactor = 0.25f; 
+    [SerializeField] private string mainMenuSceneName = "MainMenu"; // Nama scene menu utama kamu
+
     private bool isGameOverTriggered = false;
 
     private void Start()
     {
-        // Pengaman awal: Pastikan panel Game Over tidak menutupi layar saat game baru dimulai
         if (gameOverPanel != null) 
             gameOverPanel.SetActive(false);
 
-        // Pastikan waktu dunia berjalan normal kembali (1f) jika pemain melakukan Restart
+        // Pastikan waktu dunia kembali normal saat masuk map baru
         Time.timeScale = 1f; 
     }
 
     private void Update()
     {
-        // Jika belum diset atau game over sudah berjalan, abaikan fungsi di bawah
         if (playerController == null || isGameOverTriggered) return;
 
-        // TUGAS UTAMA: Mengintip apakah player sudah ambruk ke state Dead
         if (playerController.GetCurrentState() == PlayerController.PlayerState.Dead)
         {
             TriggerGameOverEffects();
@@ -39,10 +37,8 @@ public class GameOverManager : MonoBehaviour
         isGameOverTriggered = true;
         Debug.Log("Player Kalah! Memulai dramatisasi kematian...");
 
-        // 1. EFEK SLOW MOTION (Waktu dunia melambat drastis ala game AAA)
+        // 1. EFEK SLOW MOTION
         Time.timeScale = slowMoFactor;
-        
-        // Menyelaraskan kestabilan hitungan fisika Unity saat waktu melambat
         Time.fixedDeltaTime = 0.02f * Time.timeScale; 
 
         // 2. MUNCULKAN PANEL GAME OVER
@@ -50,17 +46,29 @@ public class GameOverManager : MonoBehaviour
         {
             gameOverPanel.SetActive(true);
         }
+
+        // =====================================================================
+        // KUNCI UTAMA PC GAME: Bebaskan kursor mouse agar bisa diklik pemain!
+        // =====================================================================
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     // =====================================================================
-    // FUNGSI TOMBOL UI (Pasang fungsi ini di Button Restart kamu nanti)
+    // FUNGSI UI BUTTONS
     // =====================================================================
+    
+    // Dipanggil oleh: Btn_Restart
     public void RestartLevel()
     {
-        // SANGAT WAJIB: Kembalikan waktu ke normal sebelum memuat ulang map!
         Time.timeScale = 1f; 
-        
-        // Memuat ulang scene/level yang sedang aktif saat ini dari awal
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    // Dipanggil oleh: Btn_MainMenu
+    public void QuitToMainMenu()
+    {
+        Time.timeScale = 1f; 
+        SceneManager.LoadScene(mainMenuSceneName);
     }
 }
