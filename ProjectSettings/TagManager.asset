@@ -3,17 +3,19 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Enemy
+  - Item
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Ground
   - Water
   - UI
-  - 
-  - 
-  - 
+  - Item
+  - Enemy
+  - Player
   - 
   - 
   - 
@@ -40,4 +42,40 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Shadowing
+    uniqueID: 2266441103
+    locked: 0
+  - name: Shadow-Fence
+    uniqueID: 3198060671
+    locked: 0
+  - name: House
+    uniqueID: 3668480301
+    locked: 0
+  - name: Fence
+    uniqueID: 1116176871
+    locked: 0
+  - name: Ground
+    uniqueID: 12405065
+    locked: 0
+  - name: Tree-In-Back-Char
+    uniqueID: 1203352619
+    locked: 0
+  - name: Vegetable-In-Back-Char
+    uniqueID: 1267535387
+    locked: 0
+  - name: Pole
+    uniqueID: 2002038019
+    locked: 0
+  - name: Char-Enemy
+    uniqueID: 2058695955
+    locked: 0
+  - name: Tree-In-Front-Char
+    uniqueID: 874564853
+    locked: 0
+  - name: Vegetable-In-Front-Char
+    uniqueID: 36400807
+    locked: 0
+  - name: House-In-Front-Char
+    uniqueID: 1517054443
     locked: 0
