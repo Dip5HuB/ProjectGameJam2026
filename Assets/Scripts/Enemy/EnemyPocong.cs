@@ -56,12 +56,18 @@ public class EnemyPocong : EnemyBase
         hopTimer -= Time.deltaTime;
         bool isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
 
+        if (anim != null) anim.SetBool("isGrounded", isGrounded);
+
         // LOGIKA LOMPAT RITMIS
         if (isGrounded && !isHopping && hopTimer <= 0)
         {
             isHopping = true;
             rb.velocity = new Vector2(direction * jumpForceX, jumpForceY);
-            if (anim != null) anim.SetTrigger("Jump");
+            if (anim != null) 
+            {
+                //anim.SetBool("isGrounded", false);
+                anim.SetTrigger("Jump");
+            }
         }
 
         // MENDARAT: Berikan rem horizontal agar tidak meluncur licin

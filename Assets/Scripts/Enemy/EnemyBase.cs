@@ -136,7 +136,7 @@ public class EnemyBase : MonoBehaviour
 
         if (dropSystem != null) dropSystem.DropRandomItem(transform.position);
 
-        Destroy(gameObject, 0.5f); // Beri jeda 0.5 detik agar animasi kalah selesai diputar
+        Destroy(gameObject, 2f); // Beri jeda 0.5 detik agar animasi kalah selesai diputar
     }
 
     // Helper untuk mengecek apakah player berada di dalam jarak pandang musuh

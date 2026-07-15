@@ -94,6 +94,7 @@ public class PlayerController : MonoBehaviour
     private bool isFacingRight = true;
     private int attackComboCount = 0;  // Penghitung combo attack
     private bool isMap0 = false;
+    private static int savedHealth = -1; // Variabel static untuk menyimpan darah player saat pindah scene
 
     private void Awake()
     {
@@ -116,9 +117,18 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        currentHealth = maxHealth;
         baseMoveSpeed = moveSpeed;
         currentAttackDuration = baseAttackDuration;
+
+        // Jika ada data darah yang tersimpan dari scene sebelumnya, gunakan itu
+        if (savedHealth == -1)
+        {
+            currentHealth = maxHealth; // Jika tidak ada data tersimpan, mulai dari darah penuh
+        }
+        else
+        {
+            currentHealth = savedHealth; // Gunakan data darah yang tersimpan
+        }
 
         if (hpSlider != null)
         {
@@ -325,7 +335,6 @@ public class PlayerController : MonoBehaviour
     {
         if (currentState == PlayerState.Dead) return;
 
-
         // Pastikan centangan isStagger mati setiap kali karakter keluar dari state Stagger
         if (currentState == PlayerState.Stagger)
         {
@@ -407,6 +416,7 @@ public class PlayerController : MonoBehaviour
                 anim.SetTrigger("Dead");
                 rb.velocity = Vector2.zero;
                 rb.isKinematic = true;
+                savedHealth = -1;
                 break;
             case PlayerState.Scary:
                 anim.SetBool("isScary", true);
@@ -644,6 +654,8 @@ public class PlayerController : MonoBehaviour
         {
             hpSlider.value = currentHealth;
         }
+
+        savedHealth = currentHealth; // Simpan darah player ke variabel static agar bisa diakses di scene berikutnya
     }
 
     private void FlipController()
