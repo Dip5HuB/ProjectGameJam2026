@@ -131,6 +131,18 @@ public class EnemyBase : MonoBehaviour
     {
         isDead = true;
         currentState = EnemyState.Dead;
+
+        Collider2D[] colliders = GetComponents<Collider2D>();
+        foreach (Collider2D col in colliders)
+        {
+            col.enabled = false;
+        }
+
+        if (rb != null)
+        {
+            rb.velocity = Vector2.zero;
+            rb.isKinematic = true; 
+        }
         
         if (anim != null) anim.SetTrigger("Dead"); // Memicu animasi mengempis/asap
 

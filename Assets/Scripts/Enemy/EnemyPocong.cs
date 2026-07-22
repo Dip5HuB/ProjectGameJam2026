@@ -4,8 +4,8 @@ public class EnemyPocong : EnemyBase
 {
     [Header("Pocong Hopping Mechanics")]
     [SerializeField] private float jumpForceX = 4f;
-    [SerializeField] private float jumpForceY = 5f;
-    [SerializeField] private float hopDelay = 1.2f; // Jeda antar lompatan
+    [SerializeField] private float jumpForceY = 6f;
+    [SerializeField] private float hopDelay = 1.5f; // Jeda antar lompatan
     private float hopTimer;
     private bool isHopping = false;
 
@@ -16,7 +16,7 @@ public class EnemyPocong : EnemyBase
     [Header("New Dash & Rotate Mechanics")]
     [SerializeField] private float attackRangeThreshold = 2.5f; // Jarak pemicu serangan
     [SerializeField] private float telegraphDuration = 0.5f;    // Durasi ancang-ancang
-    [SerializeField] private float dashDuration = 0.35f;         // Durasi meluncur/dash
+    [SerializeField] private float dashDuration = 0.6f;         // Durasi meluncur/dash
     [SerializeField] private float dashSpeedMultiplier = 4f;     // Kekuatan laju dash
     [SerializeField] private float recoverDuration = 0.4f;       // Waktu bangun kembali
     private float originalGravity;
@@ -33,6 +33,31 @@ public class EnemyPocong : EnemyBase
         
         // Simpan nilai gavitasi asli yang kamu setel di Inspector (misal: 1 atau 2)
         if (rb != null) originalGravity = rb.gravityScale; 
+    }
+
+    public override void ChangeState(EnemyState newState)
+    {
+        base.ChangeState(newState);
+        // Jika Pocong terkena hit (Stagger) atau mati (Dead) saat sedang rebah menerjang
+        if (newState == EnemyState.Stagger || newState == EnemyState.Dead)
+        {
+            // 1. Paksa koordinat rotasi kembali tegak lurus (0 derajat) secara instan!
+            transform.localEulerAngles = Vector3.zero;
+
+            // 2. Kembalikan skala gravitasi ke nilai aslinya agar tidak melayang tanpa bobot
+            if (rb != null) 
+            {
+                rb.gravityScale = originalGravity;
+            }
+
+            // 3. Paksa Animator langsung memutar animasi pusing tanpa delay panah transisi
+            if (anim != null && newState == EnemyState.Stagger)
+            {
+                anim.Play("Pocong Stagger");
+            }
+        }
+
+        
     }
     
     protected override void UpdateIdleState()

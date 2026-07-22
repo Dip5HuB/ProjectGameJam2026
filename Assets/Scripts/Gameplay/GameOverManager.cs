@@ -62,6 +62,7 @@ public class GameOverManager : MonoBehaviour
     public void RestartLevel()
     {
         Time.timeScale = 1f; 
+        PlayerController.ResetSavedHealth();
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
@@ -69,6 +70,7 @@ public class GameOverManager : MonoBehaviour
     public void QuitToMainMenu()
     {
         Time.timeScale = 1f; 
+        PlayerController.ResetSavedHealth();
         SceneManager.LoadScene(mainMenuSceneName);
     }
 }

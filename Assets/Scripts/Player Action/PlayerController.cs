@@ -386,7 +386,6 @@ public class PlayerController : MonoBehaviour
                 anim.SetInteger("comboStep", attackComboCount);
 
                 anim.SetTrigger("Attack");
-                ExecuteAttackDamage();
 
                 float nudgeDir = isFacingRight ? 1f : -1f;
                 rb.velocity = new Vector2(nudgeDir * 2.8f, rb.velocity.y); 
@@ -622,7 +621,7 @@ public class PlayerController : MonoBehaviour
     }
 
     // TAMBAHKAN FUNGSI BARU INI DI BAGIAN BAWAH SCRIPT KAMU:
-    private void ExecuteAttackDamage()
+    public void ExecuteAttackDamage()
     {
         // 1. Buat lingkaran fiktif di posisi attackPoint untuk mendeteksi semua objek di layer musuh
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayer);
@@ -656,6 +655,11 @@ public class PlayerController : MonoBehaviour
         }
 
         savedHealth = currentHealth; // Simpan darah player ke variabel static agar bisa diakses di scene berikutnya
+    }
+
+    public static void ResetSavedHealth()
+    {
+        savedHealth = -1;
     }
 
     private void FlipController()
