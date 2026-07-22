@@ -70,6 +70,9 @@ TagManager:
   - name: Char-Enemy
     uniqueID: 2058695955
     locked: 0
+  - name: Item-drop
+    uniqueID: 1990404409
+    locked: 0
   - name: Tree-In-Front-Char
     uniqueID: 874564853
     locked: 0

@@ -727,7 +727,7 @@ public class PlayerController : MonoBehaviour
                 break;
 
             case BuffType.Aegis:
-                isInvincible = true; // Peci haji: Kebal dari segala jenis damage
+                isInvincible = true; // Peci pa haji: Kebal dari segala jenis damage
                 Debug.Log("Buff Aegis Aktif: Karakter kebal damage!");
                 break;
         }
